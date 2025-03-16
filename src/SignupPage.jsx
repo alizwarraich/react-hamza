@@ -1,29 +1,59 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
-    const [fnval, setFnval] = useState();
-    const [lnval, setLnval] = useState();
-    const [emailval, setEmailval] = useState();
-    const [passval, setPassval] = useState();
-    const [addval, setAddval] = useState();
-    const [numval, setNumval] = useState();
-    const handleFnChange = (e) => {
-        setFnval(e.target.value);
+    const navigate = useNavigate();
+    const [userData, setUserData] = useState({
+        email: "",
+        firstName: "",
+        lastName: "",
+        password: "",
+        address: "",
+        mobileNumber: "",
+    });
+
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+            navigate("/home");
+        }
+    }, [navigate]);
+
+    const handleChange = (e) => {
+        setUserData((prevValue) => ({
+            ...prevValue,
+            [e.target.id]: e.target.value,
+        }));
     };
-    const handleLnChange = (e) => {
-        setLnval(e.target.value);
-    };
-    const handleEmailChange = (e) => {
-        setEmailval(e.target.value);
-    };
-    const handlePassChange = (e) => {
-        setPassval(e.target.value);
-    };
-    const handleAddChange = (e) => {
-        setAddval(e.target.value);
-    };
-    const handleNumChange = (e) => {
-        setNumval(e.target.value);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        fetch(
+            "https://dms-backend-e2ecf4-8e992e-65-108-245-140.traefik.me/Auth/customer-signup/",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    email: userData.email,
+                    first_name: userData.firstName,
+                    last_name: userData.lastName,
+                    password: userData.password,
+                    address: userData.address,
+                    mobile_number: userData.mobileNumber,
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            }
+        )
+            .then(() => {
+                navigate("/home");
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     };
 
     return (
@@ -33,65 +63,83 @@ const SignupPage = () => {
                     src="src/assets/login.jpg"
                     className="w-[450px] object-cover xl:rounded-l-xl xl:block hidden"
                 ></img>
-                <div className="flex flex-col items-center justify-center text-center p-16 gap-4 bg-white rounded-2xl xl:rounded-l-none">
+                <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col items-center justify-center text-center p-16 gap-4 bg-white rounded-2xl xl:rounded-l-none"
+                >
                     <h1 className="text-5xl font-bold">WELCOME</h1>
                     <p className="-mt-4">Create Your Account</p>
                     <div className="flex flex-col text-2xl text-left gap-1 -mt-4">
-                        <span>Email</span>
+                        <span>Email*</span>
                         <input
+                            id="email"
                             type="text"
-                            value={emailval}
-                            onChange={handleEmailChange}
+                            required
+                            value={userData.email}
+                            onChange={handleChange}
                             className="rounded-md p-1 border-2 outline-none focus:border-cyan-500 focus:bg-slate-300"
                         ></input>
                     </div>
                     <div className="flex flex-col text-2xl text-left gap-1 -mt-4">
-                        <span>First Name</span>
+                        <span>First Name*</span>
                         <input
+                            id="firstName"
                             type="text"
-                            value={fnval}
-                            onChange={handleFnChange}
+                            required
+                            value={userData.firstName}
+                            onChange={handleChange}
                             className="rounded-md p-1 border-2 outline-none focus:border-cyan-500 focus:bg-slate-300"
                         ></input>
                     </div>
                     <div className="flex flex-col text-2xl text-left gap-1 -mt-4">
-                        <span>Last Name</span>
+                        <span>Last Name*</span>
                         <input
+                            id="lastName"
                             type="text"
-                            value={lnval}
-                            onChange={handleLnChange}
+                            required
+                            value={userData.lastName}
+                            onChange={handleChange}
                             className="rounded-md p-1 border-2 outline-none focus:border-cyan-500 focus:bg-slate-300"
                         ></input>
                     </div>
                     <div className="flex flex-col text-2xl text-left gap-1 -mt-4">
-                        <span>Password</span>
+                        <span>Password*</span>
                         <input
+                            id="password"
                             type="password"
-                            value={passval}
-                            onChange={handlePassChange}
+                            required
+                            value={userData.password}
+                            onChange={handleChange}
                             className="rounded-md p-1 border-2 outline-none focus:border-cyan-500 focus:bg-slate-300"
                         ></input>
                     </div>
                     <div className="flex flex-col text-2xl text-left gap-1 -mt-4">
-                        <span>Address</span>
+                        <span>Address*</span>
                         <input
+                            id="address"
                             type="text"
-                            value={addval}
-                            onChange={handleAddChange}
+                            required
+                            value={userData.address}
+                            onChange={handleChange}
                             className="rounded-md p-1 border-2 outline-none focus:border-cyan-500 focus:bg-slate-300"
                         ></input>
                     </div>
                     <div className="flex flex-col text-2xl text-left gap-1 -mt-4">
-                        <span>Mobile Number</span>
+                        <span>Mobile Number*</span>
                         <input
+                            id="mobileNumber"
                             type="text"
-                            value={numval}
-                            onChange={handleNumChange}
+                            required
+                            value={userData.mobileNumber}
+                            onChange={handleChange}
                             className="rounded-md p-1 border-2 outline-none focus:border-cyan-500 focus:bg-slate-300"
                         ></input>
                     </div>
-                    <button className="px-10 py-2 text-2xl rounded-md bg-gradient-to-tr from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500">
-                        <a href="/">Sign Up</a>
+                    <button
+                        type="submit"
+                        className="px-10 py-2 text-2xl rounded-md bg-gradient-to-tr from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500"
+                    >
+                        Sign Up
                     </button>
                     <p>
                         Already have an account.
@@ -99,7 +147,7 @@ const SignupPage = () => {
                             Log In
                         </a>
                     </p>
-                </div>
+                </form>
             </div>
         </section>
     );
